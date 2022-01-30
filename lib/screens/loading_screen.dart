@@ -14,6 +14,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       // accessing the position and request users of the
       // App to enable the location services.
       print('Location services are disabled.');
+      return;
     }
 
     LocationPermission permission = await Geolocator.checkPermission();
@@ -26,6 +27,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
         // returned true. According to Android guidelines
         // your App should show an explanatory UI now.
         print('Location permissions are denied');
+        return;
       }
     }
 
@@ -33,12 +35,14 @@ class _LoadingScreenState extends State<LoadingScreen> {
       // Permissions are denied forever, handle appropriately.
       print(
           'Location permissions are permanently denied, we cannot request permissions.');
+      return;
     }
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.low);
+    print(1);
     print(position);
   }
 
@@ -48,6 +52,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       body: Center(
         child: RaisedButton(
           onPressed: () {
+            print(0);
             getLocation();
           },
           child: Text('Get Location'),
