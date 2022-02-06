@@ -16,6 +16,15 @@ class WeatherModel {
     return jsonResponse;
   }
 
+  Future<Map<String, dynamic>> getByCityNem(String cityName) async {
+    NetworkHelper networkHelper = NetworkHelper(
+        url:
+            "https://api.openweathermap.org/data/2.5/weather?q=$cityName&appid=$apiKey&units=metric");
+    var jsonResponse = await networkHelper.getData();
+    print(jsonResponse);
+    return jsonResponse;
+  }
+
   String getWeatherIcon(int condition) {
     if (condition < 300) {
       return '🌩';
