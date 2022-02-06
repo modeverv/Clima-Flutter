@@ -1,8 +1,8 @@
-import 'dart:convert' as convert;
-
+import 'package:clima/screens/location_screen.dart';
 import 'package:clima/services/location.dart';
+import 'package:clima/services/networking.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -22,25 +22,29 @@ class _LoadingScreenState extends State<LoadingScreen> {
     print('deactivate');
   }
 
+  String apiKey = 'c150656e693d902c8d68ca744914fe4e';
+
   void getLocation() async {
     Location location = Location();
     await location.getCurrentLocation();
-    double latitude = location.latitude;
-    double longitude = location.longitude;
-    print(latitude);
-    print("latitude $latitude / longitude $longitude");
-  }
-
-  void getData() async {
-    var url = Uri.parse(
-        "https://samples.openweathermap.org/data/2.5/weather?lat=35&lon=139&appid=b6907d289e10d714a6e88b30761fae22");
-    http.Response response = await http.get(url);
-    if (response.statusCode == 200) {
-      var jsonResponse =
-          convert.jsonDecode(response.body) as Map<String, dynamic>;
-      print('$jsonResponse');
-    } else {
-      print('Request failed with status: ${response.statusCode}.');
+    print(location.latitude.toStringAsFixed(0));
+    NetworkHelper networkHelper = NetworkHelper(
+        url:
+            "https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude.toStringAsFixed(0)}&lon=${location.longitude.toStringAsFixed(0)}&appid=$apiKey&units=metric");
+    var jsonResponse = await networkHelper.getData();
+    print(jsonResponse);
+    if (null != jsonResponse) {
+      double temp = jsonResponse['main']['temp'];
+      String name = jsonResponse['name'];
+      int condition = jsonResponse['weather'][0]['id'];
+      print(temp);
+      print(name);
+      print(condition);
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return LocationScreen(
+          weatherData: jsonResponse,
+        );
+      }));
     }
   }
 
@@ -48,24 +52,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    getData();
     print('build');
     return Scaffold(
       body: SafeArea(
-        child: Column(children: [
-          Center(
-            child: RaisedButton(
-              onPressed: () {
-                getLocation();
-                setState(() {
-                  this.count++;
-                });
-              },
-              child: Text('Get Location'),
-            ),
+        child: Center(
+          child: SpinKitDoubleBounce(
+            size: 100.0,
+            color: Colors.white,
           ),
-          Text(count.toString()),
-        ]),
+        ),
       ),
     );
   }
