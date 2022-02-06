@@ -1,6 +1,5 @@
 import 'package:clima/screens/location_screen.dart';
-import 'package:clima/services/location.dart';
-import 'package:clima/services/networking.dart';
+import 'package:clima/services/weather.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -22,17 +21,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
     print('deactivate');
   }
 
-  String apiKey = 'c150656e693d902c8d68ca744914fe4e';
-
   void getLocation() async {
-    Location location = Location();
-    await location.getCurrentLocation();
-    print(location.latitude.toStringAsFixed(0));
-    NetworkHelper networkHelper = NetworkHelper(
-        url:
-            "https://api.openweathermap.org/data/2.5/weather?lat=${location.latitude.toStringAsFixed(0)}&lon=${location.longitude.toStringAsFixed(0)}&appid=$apiKey&units=metric");
-    var jsonResponse = await networkHelper.getData();
-    print(jsonResponse);
+    WeatherModel weatherModel = WeatherModel();
+    Map<String, dynamic> jsonResponse = await weatherModel.getLocation();
     if (null != jsonResponse) {
       double temp = jsonResponse['main']['temp'];
       String name = jsonResponse['name'];
